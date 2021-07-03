@@ -80,7 +80,7 @@
 
 <script>
 import CTableWrapper from './Table.vue'
-import usersData from '../users/UsersData'
+import usersData from '../devices/DevicesData'
 
 export default {
   name: 'Tables',

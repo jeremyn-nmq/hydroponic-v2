@@ -3,7 +3,7 @@
     <CCol col="12" xl="8">
       <CCard>
         <CCardHeader>
-          Users
+          Devices
         </CCardHeader>
         <CCardBody>
           <CDataTable
@@ -33,12 +33,12 @@
 </template>
 
 <script>
-import usersData from './UsersData'
+import devicesData from './DevicesData'
 export default {
-  name: 'Users',
+  name: 'Devices',
   data () {
     return {
-      items: usersData,
+      items: devicesData,
       fields: [
         { key: 'username', label: 'Name', _classes: 'font-weight-bold' },
         { key: 'registered' },
@@ -69,7 +69,7 @@ export default {
       }
     },
     rowClicked (item, index) {
-      this.$router.push({path: `users/${index + 1}`})
+      this.$router.push({path: `devices/${index + 1}`})
     },
     pageChange (val) {
       this.$router.push({ query: { page: val }})
