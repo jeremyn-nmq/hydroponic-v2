@@ -3,7 +3,7 @@
     <CCol col="12" lg="6">
       <CCard>
         <CCardHeader>
-          User id:  {{ $route.params.id }}
+          Device id:  {{ $route.params.id }}
         </CCardHeader>
         <CCardBody>
           <CDataTable
@@ -23,17 +23,17 @@
 </template>
 
 <script>
-import usersData from './UsersData'
+import devicesData from './DevicesData'
 export default {
   name: 'User',
   beforeRouteEnter(to, from, next) {
     next(vm => {
-      vm.usersOpened = from.fullPath.includes('users')
+      vm.devicesOpened = from.fullPath.includes('devices')
     })
   },
   data () {
     return {
-      usersOpened: null
+      devicesOpened: null
     }
   },
   computed: {
@@ -43,22 +43,22 @@ export default {
         { key: 'value', label: '', _style: 'width:150px;' }
       ]
     },
-    userData () {
+    deviceData () {
       const id = this.$route.params.id
-      const user = usersData.find((user, index) => index + 1 == id)
-      const userDetails = user ? Object.entries(user) : [['id', 'Not found']]
-      return userDetails.map(([key, value]) => { return { key, value } })
+      const device = devicesData.find((device, index) => index + 1 == id)
+      const deviceDetails = device ? Object.entries(device) : [['id', 'Not found']]
+      return deviceDetails.map(([key, value]) => { return { key, value } })
     },
     visibleData () {
-      return this.userData.filter(param => param.key !== 'username')
+      return this.deviceData.filter(param => param.key !== 'username')
     },
     username () {
-      return this.userData.filter(param => param.key === 'username')[0].value
+      return this.deviceData.filter(param => param.key === 'username')[0].value
     }
   },
   methods: {
     goBack() {
-      this.usersOpened ? this.$router.go(-1) : this.$router.push({path: '/users'})
+      this.devicesOpened ? this.$router.go(-1) : this.$router.push({path: '/devices'})
     }
   }
 }
