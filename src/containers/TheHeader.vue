@@ -26,7 +26,7 @@
       </CHeaderNavItem>
     </CHeaderNav>
     <CHeaderNav class="mr-4">
-      Hi, Jeremy
+      Hi, {{ $store.state.currentUser.name }}
       <TheHeaderDropdownAccnt/>
     </CHeaderNav>
     <CSubheader class="px-3">
