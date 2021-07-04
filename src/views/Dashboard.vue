@@ -541,6 +541,8 @@ export default {
       }
       return $color
     }
+  },
+  mounted () {
   }
 }
 </script>
