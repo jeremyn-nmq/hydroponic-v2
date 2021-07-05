@@ -32,11 +32,13 @@ export default {
         const fbInitAccounts = fbInitData.accounts;
         let accountDetails = Object.keys(fbInitAccounts).map(key => new Account({...fbInitAccounts[key], key}));
         this.$store.commit("INIT_ACCOUNT", accountDetails);
+        localStorage.setItem('user', JSON.stringify(accountDetails))
 
         //handle sensors
         const fbInitSensors= fbInitData.sensors;
         let sensors = Object.keys(fbInitSensors).map(key => new Sensor({...fbInitSensors[key], key}));
         this.$store.commit("INIT_SENSOR", sensors);
+        localStorage.setItem('sensor', JSON.stringify(sensors))
       } else {
         console.log("No data available");
       }

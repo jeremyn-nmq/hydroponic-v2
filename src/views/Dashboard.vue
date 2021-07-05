@@ -4,8 +4,8 @@
       <CCardBody>
         <CRow>
           <CCol sm="5">
-            <h4 id="traffic" class="card-title mb-0">Traffic</h4>
-            <div class="small text-muted">November 2017</div>
+            <h4 class="card-title mb-0">Sensors</h4>
+            <div class="text-muted">{{ getCurrentDate() }}</div>
           </CCol>
           <CCol sm="7" class="d-none d-md-block">
             <CButton color="primary" class="float-right">
@@ -454,14 +454,14 @@
 
 <script>
 import MainChartExample from './charts/MainChartExample'
-import WidgetsDropdown from './widgets/WidgetsDropdown'
+// import WidgetsDropdown from './widgets/WidgetsDropdown'
 import WidgetsBrand from './widgets/WidgetsBrand'
 
 export default {
   name: 'Dashboard',
   components: {
     MainChartExample,
-    WidgetsDropdown,
+    // WidgetsDropdown,
     WidgetsBrand
   },
   data () {
@@ -527,7 +527,18 @@ export default {
       ]
     }
   },
+  mounted() {
+    let allSensors = this.$store.state.sensor;
+    let currentUser = this.$store.state.currentUser;
+    let currentSensor = currentUser.role === 'admin' ? allSensors :
+        allSensors.find(sen => sen.name.toLowerCase() === currentUser.access.toLowerCase());
+    console.log(currentSensor)
+  },
   methods: {
+    getCurrentDate(){
+      let current = new Date();
+      return `${current.getDate()}/${current.getMonth()+1}/${current.getFullYear()}`;
+    },
     color (value) {
       let $color
       if (value <= 25) {
@@ -542,7 +553,5 @@ export default {
       return $color
     }
   },
-  mounted () {
-  }
 }
 </script>
