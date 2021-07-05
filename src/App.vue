@@ -46,11 +46,21 @@ export default {
       console.error(error);
     });
 
-    // var starCountRef = fb.database().ref('/Account');
-    // starCountRef.on('value', (snapshot) => {
-    //   const data = snapshot.val();
-    //   console.log(data);
-    // });
+    var accountRef = fb.database().ref('/Account');
+    accountRef.on('value', (snapshot) => {
+      const data = snapshot.val();
+      let accountDetails = Object.keys(data).map(key => new Account({...data[key], key}));
+      this.$store.commit("INIT_ACCOUNT", accountDetails);
+      localStorage.setItem('user', JSON.stringify(accountDetails))
+    });
+
+    var sensor1Ref = fb.database().ref('/Sensor');
+    sensor1Ref.on('value', (snapshot) => {
+      const data = snapshot.val();
+      let sensors = Object.keys(data).map(key => new Sensor({...data[key], key}));
+      this.$store.commit("INIT_SENSOR", sensors);
+      localStorage.setItem('sensor', JSON.stringify(sensors))
+    });
 
     this.$http.interceptors.response.use(undefined, function (err) {
       return new Promise(function () {

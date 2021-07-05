@@ -6,6 +6,7 @@
           <CCol sm="5">
             <h4 class="card-title mb-0">Sensors</h4>
             <div class="text-muted">{{ getCurrentDate() }}</div>
+            <div>{{ this.currentSensor }}</div>
           </CCol>
           <CCol sm="7" class="d-none d-md-block">
             <CButton color="primary" class="float-right">
@@ -524,15 +525,16 @@ export default {
         { key: 'usage' },
         { key: 'payment', label: 'Payment method', _classes: 'text-center' },
         { key: 'activity' },
-      ]
+      ],
+      currentSensor: []
     }
   },
   mounted() {
     let allSensors = this.$store.state.sensor;
     let currentUser = this.$store.state.currentUser;
-    let currentSensor = currentUser.role === 'admin' ? allSensors :
+    this.currentSensor = currentUser.role === 'admin' ? allSensors :
         allSensors.find(sen => sen.name.toLowerCase() === currentUser.access.toLowerCase());
-    console.log(currentSensor)
+
   },
   methods: {
     getCurrentDate(){
