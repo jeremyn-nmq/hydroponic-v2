@@ -626,7 +626,7 @@ export default {
     },
     onSelectedSensorDate: function(e){
       console.log(e.target.value)
-      let a = this.currentSelectedSensorData[e.target.value]
+      let a = _.groupBy(this.currentSelectedSensorData[e.target.value], 'hour')
       console.log(a)
     },
     color (value) {
