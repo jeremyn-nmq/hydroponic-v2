@@ -1,12 +1,79 @@
 <template>
   <div>
     <CCard>
+      <CCardHeader>
+        <strong>Sensors</strong>
+        <div class="card-header-actions">
+          <a
+              href="https://hydroponic-5e3bd.firebaseio.com/"
+              class="card-header-action"
+              rel="noreferrer noopener"
+              target="_blank"
+          >
+            <small class="text-muted">Firebase</small>
+          </a>
+        </div>
+      </CCardHeader>
+      <CCardBody>
+        <CRow>
+          <CCol sm="12">
+            <label for="sensor-select">Choose a sensor:</label>
+            <select class="custom-select mb-2" id="sensor-select" v-on:change="onSelectedSensor($event)">
+              <option selected disabled>Select sensor</option>
+              <option v-for="(item, key) in this.userSensors" v-bind:value="item.name">
+                {{item.name}}
+              </option>
+            </select>
+          </CCol>
+        </CRow>
+        <CRow>
+          <CCol sm="12">
+            <label for="sensor-select">Choose a date:</label>
+            <select class="custom-select mb-2" id="sensor-date-select" v-on:change="onSelectedSensorDate($event)">
+              <option selected disabled>Select date</option>
+              <option v-for="(item, key) in this.currentSelectedSensorData" v-bind:value="key">
+                {{key}}
+              </option>
+            </select>
+          </CCol>
+        </CRow>
+        <CRow>
+          <div></div>
+          <CCol sm="12">
+            <CInput
+                label="Credit Card Number"
+                placeholder="0000 0000 0000 0000"
+            />
+          </CCol>
+        </CRow>
+        <CRow>
+          <CCol sm="4">
+            <CSelect
+                label="Month"
+                :options="[1,2,3,4,5,6,7,8,9,10,11,12]"
+            />
+          </CCol>
+          <CCol sm="4">
+            <CSelect
+                label="Year"
+                :options="[2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025]"
+            />
+          </CCol>
+          <CCol sm="4">
+            <CInput
+                label="CVV/CVC"
+                placeholder="123"
+            />
+          </CCol>
+        </CRow>
+      </CCardBody>
+    </CCard>
+    <CCard>
       <CCardBody>
         <CRow>
           <CCol sm="5">
             <h4 class="card-title mb-0">Sensors</h4>
             <div class="text-muted">{{ getCurrentDate() }}</div>
-            <div>{{ this.currentSensor }}</div>
           </CCol>
           <CCol sm="7" class="d-none d-md-block">
             <CButton color="primary" class="float-right">
@@ -457,6 +524,9 @@
 import MainChartExample from './charts/MainChartExample'
 // import WidgetsDropdown from './widgets/WidgetsDropdown'
 import WidgetsBrand from './widgets/WidgetsBrand'
+import _ from 'lodash';
+import moment from 'moment'
+
 
 export default {
   name: 'Dashboard',
@@ -526,20 +596,38 @@ export default {
         { key: 'payment', label: 'Payment method', _classes: 'text-center' },
         { key: 'activity' },
       ],
-      currentSensor: []
+      currentSelectedSensorData: [],
+      userSensors: [],
+      selectedSensorName: ""
     }
   },
   mounted() {
     let allSensors = this.$store.state.sensor;
     let currentUser = this.$store.state.currentUser;
-    this.currentSensor = currentUser.role === 'admin' ? allSensors :
+    this.userSensors = currentUser.role === 'admin' ? allSensors :
         allSensors.find(sen => sen.name.toLowerCase() === currentUser.access.toLowerCase());
+    // let currentSensorData = _.groupBy(this.userSensor, name);
+    // console.log(currentSensorData);
+    // const result = _.groupBy(currentSensorData, 'day');
+    // console.log(result)
 
   },
   methods: {
     getCurrentDate(){
       let current = new Date();
       return `${current.getDate()}/${current.getMonth()+1}/${current.getFullYear()}`;
+    },
+    onSelectedSensor: function(e){
+      this.selectedSensorName = e.target.value;
+      this.currentSelectedSensorData = _.filter(this.userSensors, ['name', this.selectedSensorName]);
+      this.currentSelectedSensorData = _.groupBy(this.currentSelectedSensorData[0].sensorData, 'day')
+      console.log(this.currentSelectedSensorData)
+      console.log(Object.entries(this.currentSelectedSensorData))
+    },
+    onSelectedSensorDate: function(e){
+      console.log(e.target.value)
+      let a = this.currentSelectedSensorData[e.target.value]
+      console.log(a)
     },
     color (value) {
       let $color
