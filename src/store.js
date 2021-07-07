@@ -14,6 +14,9 @@ const state = {
     sensor: JSON.parse(localStorage.getItem('sensor')) || [],
     fbInitData: {},
     currentUser: JSON.parse(localStorage.getItem('currentUser')) || [],
+    sensorChoice: {},
+    weekData: {},
+    timeChoice: {}
 }
 
 export default new Vuex.Store({
@@ -56,6 +59,15 @@ export default new Vuex.Store({
             // Vue.set(state, "currentUser", userAccount)
             state.currentUser = userAccount
         },
+        SET_CURRENT_TIME_CHOICE(state, timeChoice){
+            state.choice = timeChoice
+        },
+        SET_CURRENT_SENSOR_CHOICE(state, sensorChoice){
+            state.choice = sensorChoice
+        },
+        SET_CURRENT_SENSOR_WEEK(state, weekData){
+            state.weekData = weekData
+        },
         set(state, [variable, value]) {
             state[variable] = value
         }
@@ -84,9 +96,6 @@ export default new Vuex.Store({
             return new Promise((resolve) => {
                 commit('logout')
                 localStorage.removeItem('token')
-                localStorage.removeItem('user')
-                localStorage.removeItem('sensor')
-                localStorage.removeItem('currentUser')
                 resolve()
             })
         }
