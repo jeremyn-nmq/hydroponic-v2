@@ -10,10 +10,10 @@ const state = {
     sidebarMinimize: false,
     status: '',
     token: localStorage.getItem('token') || '',
-    user: {},
-    sensor: {},
+    user: JSON.parse(localStorage.getItem('user')) || [],
+    sensor: JSON.parse(localStorage.getItem('sensor')) || [],
     fbInitData: {},
-    currentUser: {},
+    currentUser: JSON.parse(localStorage.getItem('currentUser')) || [],
 }
 
 export default new Vuex.Store({
@@ -47,13 +47,14 @@ export default new Vuex.Store({
             }
         },
         INIT_ACCOUNT(state, accountDetails) {
-            accountDetails.forEach(acc => Vue.set(state.user, acc.email, acc))
+            state.user = accountDetails
         },
         INIT_SENSOR(state, sensors) {
-            sensors.forEach(sen => Vue.set(state.sensor, sen.name, sen))
+            state.sensor = sensors
         },
         SET_CURRENT_USER(state, userAccount){
-            Vue.set(state, "currentUser", userAccount)
+            // Vue.set(state, "currentUser", userAccount)
+            state.currentUser = userAccount
         },
         set(state, [variable, value]) {
             state[variable] = value
@@ -63,11 +64,12 @@ export default new Vuex.Store({
         login({commit, state}, user) {
             return new Promise((resolve, reject) => {
                 commit('auth_request')
-                const userAccount = state.user[user.email];
+                const userAccount = state.user.find(u => u.email == user.email);
                 if (userAccount && userAccount.password === user.password) {
                     let token = jwt.sign({name: user.email}, config.secret, {expiresIn: 86400})
                     localStorage.setItem('token', token)
                     commit('auth_success', token)
+                    localStorage.setItem('currentUser', JSON.stringify(userAccount))
                     commit('SET_CURRENT_USER', userAccount)
                     resolve()
                 } else {
@@ -82,6 +84,9 @@ export default new Vuex.Store({
             return new Promise((resolve) => {
                 commit('logout')
                 localStorage.removeItem('token')
+                localStorage.removeItem('user')
+                localStorage.removeItem('sensor')
+                localStorage.removeItem('currentUser')
                 resolve()
             })
         }
@@ -89,6 +94,14 @@ export default new Vuex.Store({
     getters: {
         isLoggedIn: state => !!state.token,
         authStatus: state => state.status,
-        getAllDataFromFirebase: state => state
+        getAllDataFromFirebase: (state) => {
+            return state;
+        },
+        getFirebaseSensor: (state) => {
+            return state.sensor
+        },
+        getCurrentUser: (state) => {
+            return state.currentUser
+        },
     }
 })

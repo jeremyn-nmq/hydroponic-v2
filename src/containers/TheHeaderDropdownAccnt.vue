@@ -29,8 +29,8 @@
       <CIcon name="cil-settings" /> Settings
     </CDropdownItem>
     <CDropdownDivider/>
-    <CDropdownItem>
-        <CButton @click="logout">
+    <CDropdownItem @click="logout">
+        <CButton>
           <CIcon name="cil-lock-locked"/> Logout
         </CButton>
     </CDropdownItem>
