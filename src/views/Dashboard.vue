@@ -15,10 +15,21 @@
         </div>
       </CCardHeader>
       <CCardBody>
-        <CRow>
+        <CRow v-if="this.userSensors.hasOwnProperty('name')">
           <CCol sm="12">
-            <label for="sensor-select">Choose a sensor:</label>
-            <select class="custom-select mb-2" id="sensor-select" v-on:change="onSelectedSensor($event)">
+            <label for="sensor-select-1">Choose a sensor:</label>
+            <select class="custom-select mb-2" id="sensor-select-1" v-on:change="onSelectedSensor($event)">
+              <option selected disabled>Select sensor</option>
+              <option v-bind:value="this.userSensors.name">
+                {{this.userSensors.name}}
+              </option>
+            </select>
+          </CCol>
+        </CRow>
+        <CRow v-else>
+          <CCol sm="12">
+            <label for="sensor-select-2">Choose a sensor:</label>
+            <select class="custom-select mb-2" id="sensor-select-2" v-on:change="onSelectedSensor($event)">
               <option selected disabled>Select sensor</option>
               <option v-for="(item, key) in this.userSensors" v-bind:value="item.name">
                 {{item.name}}
@@ -38,32 +49,73 @@
           </CCol>
         </CRow>
         <CRow>
-          <div></div>
           <CCol sm="12">
-            <CInput
-                label="Credit Card Number"
-                placeholder="0000 0000 0000 0000"
-            />
+            <label for="sensor-select">Choose a time slot to view the data:</label>
+            <select class="custom-select mb-2" id="sensor-time-select" v-on:change="onSelectedSensorDateTime($event)">
+              <option selected disabled>Select time slot</option>
+              <option v-for="(item, key) in this.currentSelectedSensorDataTime" v-bind:value="key">
+                {{key}}
+              </option>
+            </select>
           </CCol>
         </CRow>
-        <CRow>
-          <CCol sm="4">
-            <CSelect
-                label="Month"
-                :options="[1,2,3,4,5,6,7,8,9,10,11,12]"
-            />
-          </CCol>
-          <CCol sm="4">
-            <CSelect
-                label="Year"
-                :options="[2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025]"
-            />
-          </CCol>
-          <CCol sm="4">
-            <CInput
-                label="CVV/CVC"
-                placeholder="123"
-            />
+        <CRow class="mt-1" v-if="Object.entries(this.currentSelectSensorDataTimeValue).length !== 0">
+          <CCol>
+            <CCard>
+              <CCardHeader>
+                <CIcon name="cil-justify-center"/>
+                <strong> Data for {{selectedSensorName}} on {{this.selectedSensorDate}} at {{this.selectedSensorTime}} </strong>
+              </CCardHeader>
+              <CCardBody>
+                <CListGroup>
+                  <CListGroupItem
+                      class="d-flex justify-content-between align-items-center"
+                  >
+                    <strong>Pump 1 Status:</strong>
+                    <CBadge class="large-badge" v-if="this.currentSelectSensorDataTimeValue['pump1'] === 'Normal'" color="success" shape="pill">
+                      {{this.currentSelectSensorDataTimeValue['pump1']}}</CBadge>
+                    <CBadge class="large-badge" v-else color="warning" shape="pill">
+                      {{this.currentSelectSensorDataTimeValue['pump1']}}</CBadge>
+                  </CListGroupItem>
+                  <CListGroupItem
+                      class="d-flex justify-content-between align-items-center"
+                  >
+                    <strong>Pump 2 Status:</strong>
+                    <CBadge class="large-badge" v-if="this.currentSelectSensorDataTimeValue['pump2'] === 'Normal'" color="success" shape="pill">
+                      {{this.currentSelectSensorDataTimeValue['pump2']}}</CBadge>
+                    <CBadge class="large-badge" v-else color="warning" shape="pill">
+                      {{this.currentSelectSensorDataTimeValue['pump2']}}</CBadge>
+                  </CListGroupItem>
+                  <CListGroupItem
+                      class="d-flex justify-content-between align-items-center"
+                  >
+                    <strong>pH Level:</strong>
+                    <CBadge class="large-badge" color="info" shape="pill">{{this.currentSelectSensorDataTimeValue['pH']}}</CBadge>
+                  </CListGroupItem>
+                  <CListGroupItem
+                      class="d-flex justify-content-between align-items-center"
+                  >
+                    <strong>TDS:</strong>
+                    <CBadge class="large-badge" color="info" shape="pill">{{this.currentSelectSensorDataTimeValue['tds']}}</CBadge>
+                  </CListGroupItem>
+                  <CListGroupItem
+                      class="d-flex justify-content-between align-items-center"
+                  >
+                    <strong>Temperature:</strong>
+                    <CBadge class="large-badge" color="info" shape="pill">{{this.currentSelectSensorDataTimeValue['temperature']}}</CBadge>
+                  </CListGroupItem>
+                  <CListGroupItem
+                      class="d-flex justify-content-between align-items-center"
+                  >
+                    <strong>Water Level:</strong>
+                    <CBadge class="large-badge" v-if="this.currentSelectSensorDataTimeValue['waterLevel'] === 'Normal'" color="success" shape="pill">
+                      {{this.currentSelectSensorDataTimeValue['waterLevel']}}</CBadge>
+                    <CBadge class="large-badge" v-else color="warning" shape="pill">
+                      {{this.currentSelectSensorDataTimeValue['waterLevel']}}</CBadge>
+                  </CListGroupItem>
+                </CListGroup>
+              </CCardBody>
+            </CCard>
           </CCol>
         </CRow>
       </CCardBody>
@@ -597,8 +649,13 @@ export default {
         { key: 'activity' },
       ],
       currentSelectedSensorData: [],
+      currentSelectedSensorDataTime: [],
+      currentSelectSensorDataTimeValue: [],
       userSensors: [],
-      selectedSensorName: ""
+      selectedSensorName: "",
+      selectedSensorDate: "",
+      selectedSensorTime: "",
+
     }
   },
   mounted() {
@@ -606,11 +663,6 @@ export default {
     let currentUser = this.$store.state.currentUser;
     this.userSensors = currentUser.role === 'admin' ? allSensors :
         allSensors.find(sen => sen.name.toLowerCase() === currentUser.access.toLowerCase());
-    // let currentSensorData = _.groupBy(this.userSensor, name);
-    // console.log(currentSensorData);
-    // const result = _.groupBy(currentSensorData, 'day');
-    // console.log(result)
-
   },
   methods: {
     getCurrentDate(){
@@ -618,16 +670,22 @@ export default {
       return `${current.getDate()}/${current.getMonth()+1}/${current.getFullYear()}`;
     },
     onSelectedSensor: function(e){
-      this.selectedSensorName = e.target.value;
-      this.currentSelectedSensorData = _.filter(this.userSensors, ['name', this.selectedSensorName]);
-      this.currentSelectedSensorData = _.groupBy(this.currentSelectedSensorData[0].sensorData, 'day')
-      console.log(this.currentSelectedSensorData)
-      console.log(Object.entries(this.currentSelectedSensorData))
+      this.selectedSensorName = this.userSensors.hasOwnProperty('name') ?this.userSensors.name : e.target.value;
+      if (this.userSensors.hasOwnProperty('name')){
+        this.currentSelectedSensorData = _.groupBy(this.userSensors.sensorData, 'day')
+      }
+      else{
+        this.currentSelectedSensorData = _.filter(this.userSensors, ['name', this.selectedSensorName]);
+        this.currentSelectedSensorData = _.groupBy(this.currentSelectedSensorData[0].sensorData, 'day')
+      }
     },
     onSelectedSensorDate: function(e){
-      console.log(e.target.value)
-      let a = _.groupBy(this.currentSelectedSensorData[e.target.value], 'hour')
-      console.log(a)
+      this.selectedSensorDate = e.target.value;
+      this.currentSelectedSensorDataTime = _.groupBy(this.currentSelectedSensorData[this.selectedSensorDate], 'hour')
+    },
+    onSelectedSensorDateTime: function(e){
+      this.selectedSensorTime = e.target.value
+      this.currentSelectSensorDataTimeValue = this.currentSelectedSensorDataTime[this.selectedSensorTime][0];
     },
     color (value) {
       let $color
