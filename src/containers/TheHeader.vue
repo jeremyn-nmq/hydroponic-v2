@@ -19,11 +19,6 @@
           Dashboard
         </CHeaderNavLink>
       </CHeaderNavItem>
-      <CHeaderNavItem class="px-3">
-        <CHeaderNavLink to="/devices" exact>
-          Devices
-        </CHeaderNavLink>
-      </CHeaderNavItem>
     </CHeaderNav>
     <CHeaderNav class="mr-4">
       Hi, {{ $store.state.currentUser.name }}

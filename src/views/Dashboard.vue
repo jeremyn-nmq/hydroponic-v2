@@ -1,20 +1,15 @@
 <template>
   <div>
     <CCard>
-      <CCardHeader>
-        <strong>Sensors</strong>
-        <div class="card-header-actions">
-          <a
-              href="https://hydroponic-5e3bd.firebaseio.com/"
-              class="card-header-action"
-              rel="noreferrer noopener"
-              target="_blank"
-          >
-            <small class="text-muted">Firebase</small>
-          </a>
-        </div>
-      </CCardHeader>
       <CCardBody>
+        <CRow>
+          <CCol sm="6">
+            <h4 class="card-title mb-0">Data</h4>
+          </CCol>
+          <CCol sm="6" class="d-flex flex-row-reverse">
+            {{getCurrentDate()}}
+          </CCol>
+        </CRow>
         <CRow v-if="this.userSensors.hasOwnProperty('name')">
           <CCol sm="12">
             <label for="sensor-select-1">Choose a sensor:</label>
@@ -39,7 +34,7 @@
         </CRow>
         <CRow>
           <CCol sm="12">
-            <label for="sensor-select">Choose a date:</label>
+            <label for="sensor-date-select">Choose a date:</label>
             <select class="custom-select mb-2" id="sensor-date-select" v-on:change="onSelectedSensorDate($event)">
               <option selected disabled>Select date</option>
               <option v-for="(item, key) in this.currentSelectedSensorData" v-bind:value="key">
@@ -50,7 +45,7 @@
         </CRow>
         <CRow>
           <CCol sm="12">
-            <label for="sensor-select">Choose a time slot to view the data:</label>
+            <label for="sensor-time-select">Choose a time slot to view the data:</label>
             <select class="custom-select mb-2" id="sensor-time-select" v-on:change="onSelectedSensorDateTime($event)">
               <option selected disabled>Select time slot</option>
               <option v-for="(item, key) in this.currentSelectedSensorDataTime" v-bind:value="key">
@@ -64,7 +59,8 @@
             <CCard>
               <CCardHeader>
                 <CIcon name="cil-justify-center"/>
-                <strong> Data for {{selectedSensorName}} on {{this.selectedSensorDate}} at {{this.selectedSensorTime}} </strong>
+                <strong> Data for {{selectedSensorName.replace(/([^A-Za-z0-9])/g, ' $1')}} on
+                  {{this.selectedSensorDate}} at {{this.selectedSensorTime}} </strong>
               </CCardHeader>
               <CCardBody>
                 <CListGroup>
@@ -120,534 +116,82 @@
         </CRow>
       </CCardBody>
     </CCard>
-    <CCard>
-      <CCardBody>
-        <CRow>
-          <CCol sm="5">
-            <h4 class="card-title mb-0">Sensors</h4>
-            <div class="text-muted">{{ getCurrentDate() }}</div>
-          </CCol>
-          <CCol sm="7" class="d-none d-md-block">
-            <CButton color="primary" class="float-right">
-              <CIcon name="cil-cloud-download"/>
-            </CButton>
-            <CButtonGroup class="float-right mr-3">
-              <CButton
-                color="outline-secondary"
-                v-for="(value, key) in ['Day', 'Month', 'Year']"
-                :key="key"
-                class="mx-0"
-                :pressed="value === selected ? true : false"
-                @click="selected = value"
-              >
-                {{value}}
-              </CButton>
-            </CButtonGroup>
-          </CCol>
-        </CRow>
-        <MainChartExample style="height:300px;margin-top:40px;"/>
-      </CCardBody>
-      <CCardFooter>
-        <CRow class="text-center">
-          <CCol md sm="12" class="mb-sm-2 mb-0">
-            <div class="text-muted">Visits</div>
-            <strong>29.703 Users (40%)</strong>
-            <CProgress
-              class="progress-xs mt-2"
-              :precision="1"
-              color="success"
-              :value="40"
-            />
-          </CCol>
-          <CCol md sm="12" class="mb-sm-2 mb-0 d-md-down-none">
-            <div class="text-muted">Unique</div>
-            <strong>24.093 Users (20%)</strong>
-            <CProgress
-              class="progress-xs mt-2"
-              :precision="1"
-              color="info"
-              :value="20"
-            />
-          </CCol>
-          <CCol md sm="12" class="mb-sm-2 mb-0">
-            <div class="text-muted">Pageviews</div>
-            <strong>78.706 Views (60%)</strong>
-            <CProgress
-              class="progress-xs mt-2"
-              :precision="1"
-              color="warning"
-              :value="60"
-            />
-          </CCol>
-          <CCol md sm="12" class="mb-sm-2 mb-0">
-            <div class="text-muted">New Users</div>
-            <strong>22.123 Users (80%)</strong>
-            <CProgress
-              class="progress-xs mt-2"
-              :precision="1"
-              color="danger"
-              :value="80"
-            />
-          </CCol>
-          <CCol md sm="12" class="mb-sm-2 mb-0 d-md-down-none">
-            <div class="text-muted">Bounce Rate</div>
-            <strong>Average Rate (40.15%)</strong>
-            <CProgress
-              class="progress-xs mt-2"
-              :precision="1"
-              :value="40"
-            />
-          </CCol>
-        </CRow>
-      </CCardFooter>
-    </CCard>
-    <WidgetsBrand/>
-    <CRow>
-      <CCol md="12">
+    <div v-if="this.userSensors.hasOwnProperty('name')">
+      <div v-bind:value="this.userSensors">
         <CCard>
-          <CCardHeader>
-            Traffic &amp; Sales
-          </CCardHeader>
           <CCardBody>
             <CRow>
-              <CCol sm="12" lg="6">
-                <CRow>
-                  <CCol sm="6">
-                    <CCallout color="info">
-                      <small class="text-muted">New Clients</small><br>
-                      <strong class="h4">9,123</strong>
-                    </CCallout>
-                  </CCol>
-                  <CCol sm="6">
-                    <CCallout color="danger">
-                      <small class="text-muted">Recurring Clients</small><br>
-                      <strong class="h4">22,643</strong>
-                    </CCallout>
-                  </CCol>
-                </CRow>
-                <hr class="mt-0">
-                <div class="progress-group mb-4">
-                  <div class="progress-group-prepend">
-                    <span class="progress-group-text">
-                      Monday
-                    </span>
-                  </div>
-                  <div class="progress-group-bars">
-                    <CProgress
-                      class="progress-xs"
-                      color="info"
-                      :value="34"
-                    />
-                    <CProgress
-                      class="progress-xs"
-                      color="danger"
-                      :value="78"
-                    />
-                  </div>
-                </div>
-                <div class="progress-group mb-4">
-                  <div class="progress-group-prepend">
-                    <span class="progress-group-text">
-                      Tuesday
-                    </span>
-                  </div>
-                  <div class="progress-group-bars">
-                    <CProgress
-                      class="progress-xs"
-                      :value="56"
-                      color="info"
-                    />
-                    <CProgress
-                      class="progress-xs"
-                      :value="94"
-                      color="danger"
-                    />
-                  </div>
-                </div>
-                <div class="progress-group mb-4">
-                  <div class="progress-group-prepend">
-                    <span class="progress-group-text">
-                      Wednesday
-                    </span>
-                  </div>
-                  <div class="progress-group-bars">
-                    <CProgress
-                      class="progress-xs"
-                      :value="12"
-                      color="info"
-                    />
-                    <CProgress
-                      class="progress-xs"
-                      :value="67"
-                      color="danger"
-                    />
-                  </div>
-                </div>
-                <div class="progress-group mb-4">
-                  <div class="progress-group-prepend">
-                    <span class="progress-group-text">
-                      Thursday
-                    </span>
-                  </div>
-                  <div class="progress-group-bars">
-                    <CProgress
-                      class="progress-xs"
-                      :value="43"
-                      color="info"
-                    />
-                    <CProgress
-                      class="progress-xs"
-                      :value="91"
-                      color="danger"
-                    />
-                  </div>
-                </div>
-                <div class="progress-group mb-4">
-                  <div class="progress-group-prepend">
-                    <span class="progress-group-text">
-                      Friday
-                    </span>
-                  </div>
-                  <div class="progress-group-bars">
-                    <CProgress
-                      class="progress-xs"
-                      :value="22"
-                      color="info"
-                    />
-                    <CProgress
-                      class="progress-xs"
-                      :value="73"
-                      color="danger"
-                    />
-                  </div>
-                </div>
-                <div class="progress-group mb-4">
-                  <div class="progress-group-prepend">
-                    <span class="progress-group-text">
-                      Saturday
-                    </span>
-                  </div>
-                  <div class="progress-group-bars">
-                    <CProgress
-                      class="progress-xs"
-                      :value="53"
-                      color="info"
-                    />
-                    <CProgress
-                      class="progress-xs"
-                      :value="82"
-                      color="danger"
-                    />
-                  </div>
-                </div>
-                <div class="progress-group mb-4">
-                  <div class="progress-group-prepend">
-                    <span class="progress-group-text">
-                      Sunday
-                    </span>
-                  </div>
-                  <div class="progress-group-bars">
-                    <CProgress
-                      class="progress-xs"
-                      :value="9"
-                      color="info"
-                    />
-                    <CProgress
-                      class="progress-xs"
-                      :value="69"
-                      color="danger"
-                    />
-                  </div>
-                </div>
-                <div class="legend text-center">
-                  <small>
-                    <sup><CBadge shape="pill" color="info">&nbsp;</CBadge></sup>
-                    New clients
-                    &nbsp;&nbsp;
-                    <sup><CBadge shape="pill" color="danger">&nbsp;</CBadge></sup>
-                    Recurring clients
-                  </small>
+              <CCol sm="5">
+                <h4 class="card-title mb-0">{{this.userSensors.name}}</h4>
+                <div class="text-muted mt-1">
+                  Latest data on {{ this.userSensors.sensorData[0].day}}
                 </div>
               </CCol>
-              <CCol sm="12" lg="6">
-                <CRow>
-                  <CCol sm="6">
-                    <CCallout color="warning">
-                      <small class="text-muted">Pageviews</small><br>
-                      <strong class="h4">78,623</strong>
-                    </CCallout>
-                  </CCol>
-                  <CCol sm="6">
-                    <CCallout color="success">
-                      <small class="text-muted">Organic</small><br>
-                      <strong class="h4">49,123</strong>
-                    </CCallout>
-                  </CCol>
-                </CRow>
-                <hr class="mt-0">
-                <ul class="horizontal-bars type-2">
-                  <div class="progress-group">
-                    <div class="progress-group-header">
-                      <CIcon name="cil-user" class="progress-group-icon"/>
-                      <span class="title">Male</span>
-                      <span class="ml-auto font-weight-bold">43%</span>
-                    </div>
-                    <div class="progress-group-bars">
-                      <CProgress
-                        class="progress-xs"
-                        :value="43"
-                        color="warning"
-                      />
-                    </div>
-                  </div>
-                  <div class="progress-group mb-5">
-                    <div class="progress-group-header">
-                      <CIcon name="cil-user-female" class="progress-group-icon"/>
-                      <span class="title">Female</span>
-                      <span class="ml-auto font-weight-bold">37%</span>
-                    </div>
-                    <div class="progress-group-bars">
-                      <CProgress
-                        class="progress-xs"
-                        :value="37"
-                        color="warning"
-                      />
-                    </div>
-                  </div>
-                  <div class="progress-group">
-                    <div class="progress-group-header">
-                      <CIcon name="cil-globe-alt" class="progress-group-icon"/>
-                      <span class="title">Organic Search</span>
-                      <span class="ml-auto font-weight-bold">
-                        191,235 <span class="text-muted small">(56%)</span>
-                      </span>
-                    </div>
-                    <div class="progress-group-bars">
-                      <CProgress
-                        class="progress-xs"
-                        :value="56"
-                        color="success"
-                      />
-                    </div>
-                  </div>
-                  <div class="progress-group">
-                    <div class="progress-group-header">
-                      <CIcon
-                        name="cib-facebook"
-                        height="17"
-                        class="progress-group-icon"
-                      />
-                      <span class="title">Facebook</span>
-                      <span class="ml-auto font-weight-bold">
-                        51,223 <span class="text-muted small">(15%)</span>
-                      </span>
-                    </div>
-                    <div class="progress-group-bars">
-                      <CProgress
-                        class="progress-xs"
-                        :value="15"
-                        color="success"
-                      />
-                    </div>
-                  </div>
-                  <div class="progress-group">
-                    <div class="progress-group-header">
-                      <CIcon
-                        name="cib-twitter"
-                        height="17"
-                        class="progress-group-icon"
-                      />
-                      <span class="title">Twitter</span>
-                      <span class="ml-auto font-weight-bold">
-                        37,564 <span class="text-muted small">(11%)</span>
-                      </span>
-                    </div>
-                    <div class="progress-group-bars">
-                      <CProgress
-                        class="progress-xs"
-                        :value="11"
-                        color="success"
-                      />
-                    </div>
-                  </div>
-                  <div class="progress-group">
-                    <div class="progress-group-header">
-                      <CIcon
-                        name="cib-linkedin"
-                        height="17"
-                        class="progress-group-icon"
-                      />
-                      <span class="title">LinkedIn</span>
-                      <span class="ml-auto font-weight-bold">
-                        27,319 <span class="text-muted small">&nbsp;(8%)</span>
-                      </span>
-                    </div>
-                    <div class="progress-group-bars">
-                      <CProgress
-                        class="progress-xs"
-                        :value="8"
-                        color="success"
-                      />
-                    </div>
-                  </div>
-                  <div class="divider text-center">
-                    <CButton color="link" size="sm" class="text-muted">
-                      <CIcon name="cil-options"/>
-                    </CButton>
-                  </div>
-                </ul>
+              <CCol sm="7" class="d-none d-md-block">
+                <CButtonGroup class="float-right mr-3">
+                  <CButton
+                      color="outline-secondary"
+                      v-for="(value, key) in ['pH', 'Temperature', 'TDS']"
+                      :key="key"
+                      class="mx-0"
+                      :pressed="value === userSensors.param"
+                      @click="userSensors.param = value"
+                  >
+                    {{value}}
+                  </CButton>
+                </CButtonGroup>
               </CCol>
             </CRow>
-            <br/>
-            <CDataTable
-              class="mb-0 table-outline"
-              hover
-              :items="tableItems"
-              :fields="tableFields"
-              head-color="light"
-              no-sorting
-            >
-              <td slot="avatar" class="text-center" slot-scope="{item}">
-                <div class="c-avatar">
-                  <img :src="item.avatar.url" class="c-avatar-img" alt="">
-                  <span
-                    class="c-avatar-status"
-                    :class="`bg-${item.avatar.status || 'secondary'}`"
-                  ></span>
-                </div>
-              </td>
-              <td slot="user" slot-scope="{item}">
-                <div>{{item.user.name}}</div>
-                <div class="small text-muted">
-                  <span>
-                    <template v-if="item.user.new">New</template>
-                    <template v-else>Recurring</template>
-                  </span> | Registered: {{item.user.registered}}
-                </div>
-              </td>
-              <td
-                slot="country"
-                slot-scope="{item}"
-                class="text-center"
-              >
-                <CIcon
-                  :name="item.country.flag"
-                  height="25"
-                />
-              </td>
-              <td slot="usage" slot-scope="{item}">
-                <div class="clearfix">
-                  <div class="float-left">
-                    <strong>{{item.usage.value}}%</strong>
-                  </div>
-                  <div class="float-right">
-                    <small class="text-muted">{{item.usage.period}}</small>
-                  </div>
-                </div>
-                <CProgress
-                  class="progress-xs"
-                  v-model="item.usage.value"
-                  :color="color(item.usage.value)"
-                />
-              </td>
-              <td
-                slot="payment"
-                slot-scope="{item}"
-                class="text-center"
-              >
-                <CIcon
-                  :name="item.payment.icon"
-                  height="25"
-                />
-              </td>
-              <td slot="activity" slot-scope="{item}">
-                <div class="small text-muted">Last login</div>
-                <strong>{{item.activity}}</strong>
-              </td>
-            </CDataTable>
+            <MainChartExample style="height:300px;margin-top:40px;" :current-sensor="this.userSensors" :current-param="userSensors.param"/>
           </CCardBody>
         </CCard>
-      </CCol>
-    </CRow>
+      </div>
+    </div>
+    <div v-else>
+      <div v-for="(item, key) in this.userSensors" v-bind:value="item">
+        <CCard>
+          <CCardBody>
+            <CRow>
+              <CCol sm="5">
+                <h4 class="card-title mb-0">{{item.name}}</h4>
+                <div class="text-muted">Latest data on {{ item.sensorData[0].day }}</div>
+              </CCol>
+              <CCol sm="7" class="d-none d-md-block">
+                <CButtonGroup class="float-right mr-3">
+                  <CButton
+                      color="outline-secondary"
+                      v-for="(value, key) in ['pH', 'Temperature', 'TDS']"
+                      :key="key"
+                      class="mx-0"
+                      :pressed="value === item.param"
+                      @click="item.param = value"
+                  >
+                    {{value}}
+                  </CButton>
+                </CButtonGroup>
+              </CCol>
+            </CRow>
+            <MainChartExample style="height:300px;margin-top:40px;" :current-sensor="item" :current-param="item.param"/>
+          </CCardBody>
+        </CCard>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import MainChartExample from './charts/MainChartExample'
-// import WidgetsDropdown from './widgets/WidgetsDropdown'
 import WidgetsBrand from './widgets/WidgetsBrand'
 import _ from 'lodash';
-import moment from 'moment'
-
 
 export default {
   name: 'Dashboard',
   components: {
     MainChartExample,
-    // WidgetsDropdown,
     WidgetsBrand
   },
   data () {
     return {
-      selected: 'Month',
-      tableItems: [
-        {
-          avatar: { url: 'img/avatars/1.jpg', status: 'success' },
-          user: { name: 'Yiorgos Avraamu', new: true, registered: 'Jan 1, 2015' },
-          country: { name: 'USA', flag: 'cif-us' },
-          usage: { value: 50, period: 'Jun 11, 2015 - Jul 10, 2015' },
-          payment: { name: 'Mastercard', icon: 'cib-cc-mastercard' },
-          activity: '10 sec ago'
-        },
-        {
-          avatar: { url: 'img/avatars/2.jpg', status: 'danger' },
-          user: { name: 'Avram Tarasios', new: false, registered: 'Jan 1, 2015' },
-          country: { name: 'Brazil', flag: 'cif-br' },
-          usage: { value: 22, period: 'Jun 11, 2015 - Jul 10, 2015' },
-          payment: { name: 'Visa', icon: 'cib-cc-visa' },
-          activity: '5 minutes ago'
-        },
-        {
-          avatar: { url: 'img/avatars/3.jpg', status: 'warning' },
-          user: { name: 'Quintin Ed', new: true, registered: 'Jan 1, 2015' },
-          country: { name: 'India', flag: 'cif-in' },
-          usage: { value: 74, period: 'Jun 11, 2015 - Jul 10, 2015' },
-          payment: { name: 'Stripe', icon: 'cib-stripe' },
-          activity: '1 hour ago'
-        },
-        {
-          avatar: { url: 'img/avatars/4.jpg', status: '' },
-          user: { name: 'Enéas Kwadwo', new: true, registered: 'Jan 1, 2015' },
-          country: { name: 'France', flag: 'cif-fr' },
-          usage: { value: 98, period: 'Jun 11, 2015 - Jul 10, 2015' },
-          payment: { name: 'PayPal', icon: 'cib-paypal' },
-          activity: 'Last month'
-        },
-        {
-          avatar: { url: 'img/avatars/5.jpg', status: 'success' },
-          user: { name: 'Agapetus Tadeáš', new: true, registered: 'Jan 1, 2015' },
-          country: { name: 'Spain', flag: 'cif-es' },
-          usage: { value: 22, period: 'Jun 11, 2015 - Jul 10, 2015' },
-          payment: { name: 'Google Wallet', icon: 'cib-google-pay' },
-          activity: 'Last week'
-        },
-        {
-          avatar: { url: 'img/avatars/6.jpg', status: 'danger' },
-          user: { name: 'Friderik Dávid', new: true, registered: 'Jan 1, 2015' },
-          country: { name: 'Poland', flag: 'cif-pl' },
-          usage: { value: 43, period: 'Jun 11, 2015 - Jul 10, 2015' },
-          payment: { name: 'Amex', icon: 'cib-cc-amex' },
-          activity: 'Last week'
-        }
-      ],
-      tableFields: [
-        { key: 'avatar', label: '', _classes: 'text-center' },
-        { key: 'user' },
-        { key: 'country', _classes: 'text-center' },
-        { key: 'usage' },
-        { key: 'payment', label: 'Payment method', _classes: 'text-center' },
-        { key: 'activity' },
-      ],
       currentSelectedSensorData: [],
       currentSelectedSensorDataTime: [],
       currentSelectSensorDataTimeValue: [],
@@ -655,50 +199,44 @@ export default {
       selectedSensorName: "",
       selectedSensorDate: "",
       selectedSensorTime: "",
-
     }
   },
   mounted() {
     let allSensors = this.$store.state.sensor;
     let currentUser = this.$store.state.currentUser;
     this.userSensors = currentUser.role === 'admin' ? allSensors :
-        allSensors.find(sen => sen.name.toLowerCase() === currentUser.access.toLowerCase());
+        allSensors.find(sen => sen.name.toLowerCase() === currentUser.access.replace(/([0-9])/g, ' $1').toLowerCase());
+    console.log(this.userSensors)
   },
   methods: {
     getCurrentDate(){
-      let current = new Date();
-      return `${current.getDate()}/${current.getMonth()+1}/${current.getFullYear()}`;
+      return new Date().toLocaleDateString("en-GB");
     },
     onSelectedSensor: function(e){
       this.selectedSensorName = this.userSensors.hasOwnProperty('name') ?this.userSensors.name : e.target.value;
       if (this.userSensors.hasOwnProperty('name')){
         this.currentSelectedSensorData = _.groupBy(this.userSensors.sensorData, 'day')
+        console.log("On selected sensor:");
+        console.log(this.currentSelectedSensorData);
       }
       else{
         this.currentSelectedSensorData = _.filter(this.userSensors, ['name', this.selectedSensorName]);
         this.currentSelectedSensorData = _.groupBy(this.currentSelectedSensorData[0].sensorData, 'day')
+        console.log("On selected sensor:");
+        console.log(this.currentSelectedSensorData)
       }
     },
     onSelectedSensorDate: function(e){
       this.selectedSensorDate = e.target.value;
       this.currentSelectedSensorDataTime = _.groupBy(this.currentSelectedSensorData[this.selectedSensorDate], 'hour')
+      console.log("On selected date:")
+      console.log(this.currentSelectedSensorDataTime);
     },
     onSelectedSensorDateTime: function(e){
       this.selectedSensorTime = e.target.value
       this.currentSelectSensorDataTimeValue = this.currentSelectedSensorDataTime[this.selectedSensorTime][0];
-    },
-    color (value) {
-      let $color
-      if (value <= 25) {
-        $color = 'info'
-      } else if (value > 25 && value <= 50) {
-        $color = 'success'
-      } else if (value > 50 && value <= 75) {
-        $color = 'warning'
-      } else if (value > 75 && value <= 100) {
-        $color = 'danger'
-      }
-      return $color
+      console.log("On selected time:")
+      console.log(this.currentSelectSensorDataTimeValue);
     }
   },
 }
