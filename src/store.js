@@ -84,9 +84,6 @@ export default new Vuex.Store({
             return new Promise((resolve) => {
                 commit('logout')
                 localStorage.removeItem('token')
-                // localStorage.removeItem('user')
-                // localStorage.removeItem('currentUser')
-                // localStorage.removeItem('sensor')
                 resolve()
             })
         }
