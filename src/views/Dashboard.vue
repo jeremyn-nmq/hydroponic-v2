@@ -2,7 +2,7 @@
   <div>
     <CCard>
       <CCardBody>
-        <CRow>
+        <CRow class="mb-3">
           <CCol sm="6">
             <h4 class="card-title mb-0">Data</h4>
           </CCol>
@@ -142,7 +142,7 @@
                 </CButtonGroup>
               </CCol>
             </CRow>
-            <MainChartExample style="height:300px;margin-top:40px;" :current-sensor="this.userSensors" :current-param="userSensors.param"/>
+            <MainChart style="height:300px;margin-top:40px;" :current-sensor="this.userSensors" :current-param="userSensors.param"/>
           </CCardBody>
         </CCard>
       </div>
@@ -171,7 +171,7 @@
                 </CButtonGroup>
               </CCol>
             </CRow>
-            <MainChartExample style="height:300px;margin-top:40px;" :current-sensor="item" :current-param="item.param"/>
+            <MainChart style="height:300px;margin-top:40px;" :current-sensor="item" :current-param="item.param"/>
           </CCardBody>
         </CCard>
       </div>
@@ -180,15 +180,13 @@
 </template>
 
 <script>
-import MainChartExample from './charts/MainChartExample'
-import WidgetsBrand from './widgets/WidgetsBrand'
+import MainChart from './charts/MainChart'
 import _ from 'lodash';
 
 export default {
   name: 'Dashboard',
   components: {
-    MainChartExample,
-    WidgetsBrand
+    MainChart
   },
   data () {
     return {
@@ -234,6 +232,7 @@ export default {
     },
     onSelectedSensorDateTime: function(e){
       this.selectedSensorTime = e.target.value
+      console.log(this.selectedSensorTime)
       this.currentSelectSensorDataTimeValue = this.currentSelectedSensorDataTime[this.selectedSensorTime][0];
       console.log("On selected time:")
       console.log(this.currentSelectSensorDataTimeValue);

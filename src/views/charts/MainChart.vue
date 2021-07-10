@@ -11,12 +11,8 @@ import { CChartLine } from '@coreui/vue-chartjs'
 import { getStyle, hexToRgba } from '@coreui/utils/src'
 import _ from "lodash";
 
-function random (min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min)
-}
-
 export default {
-  name: 'MainChartExample',
+  name: 'MainChart',
   components: {
     CChartLine
   },
@@ -38,22 +34,14 @@ export default {
     },
   },
   mounted(){
-    let lastestDay = this.currentSensor.sensorData[0].day;
+    let latestDay = this.currentSensor.sensorData[0].day;
 
-    this.transformedData = _.groupBy(_.groupBy(this.currentSensor.sensorData, 'day')[lastestDay], 'hour')
-    console.log(this.transformedData);
+    this.transformedData = _.groupBy(_.groupBy(this.currentSensor.sensorData, 'day')[latestDay], 'hour')
     this.labels = Object.keys(this.transformedData);
-    console.log(Object.values(this.transformedData))
-    let b = Object.values(this.transformedData);
-    for(let a in b){
-      console.log(b[a][0])
-    }
   },
   computed: {
     pHDatasets () {
-      const brandSuccess = getStyle('success2') || '#4dbd74'
       const brandInfo = getStyle('info') || '#20a8d8'
-      const brandDanger = getStyle('danger') || '#f86c6b'
 
       const pH = []
 
@@ -120,7 +108,7 @@ export default {
 
         maintainAspectRatio: false,
         legend: {
-          display: true
+          display: false
         },
         scales: {
           xAxes: [{
