@@ -45,7 +45,7 @@
         </CRow>
         <CRow>
           <CCol sm="12">
-            <label for="sensor-time-select">Choose a time slot to view the data:</label>
+            <label for="sensor-time-select">Choose a time slot to view details:</label>
             <select class="custom-select mb-2" id="sensor-time-select" v-on:change="onSelectedSensorDateTime($event)">
               <option selected disabled>Select time slot</option>
               <option v-for="(item, key) in this.currentSelectedSensorDataTime" v-bind:value="key">
@@ -57,60 +57,62 @@
         <CRow class="mt-1" v-if="Object.entries(this.currentSelectSensorDataTimeValue).length !== 0">
           <CCol>
             <CCard>
-              <CCardHeader>
-                <CIcon name="cil-justify-center"/>
-                <strong> Data for {{selectedSensorName.replace(/([^A-Za-z0-9])/g, ' $1')}} on
-                  {{this.selectedSensorDate}} at {{this.selectedSensorTime}} </strong>
-              </CCardHeader>
-              <CCardBody>
-                <CListGroup>
-                  <CListGroupItem
-                      class="d-flex justify-content-between align-items-center"
-                  >
-                    <strong>Pump 1 Status:</strong>
-                    <CBadge class="large-badge" v-if="this.currentSelectSensorDataTimeValue['pump1'] === 'Normal'" color="success" shape="pill">
-                      {{this.currentSelectSensorDataTimeValue['pump1']}}</CBadge>
-                    <CBadge class="large-badge" v-else color="warning" shape="pill">
-                      {{this.currentSelectSensorDataTimeValue['pump1']}}</CBadge>
-                  </CListGroupItem>
-                  <CListGroupItem
-                      class="d-flex justify-content-between align-items-center"
-                  >
-                    <strong>Pump 2 Status:</strong>
-                    <CBadge class="large-badge" v-if="this.currentSelectSensorDataTimeValue['pump2'] === 'Normal'" color="success" shape="pill">
-                      {{this.currentSelectSensorDataTimeValue['pump2']}}</CBadge>
-                    <CBadge class="large-badge" v-else color="warning" shape="pill">
-                      {{this.currentSelectSensorDataTimeValue['pump2']}}</CBadge>
-                  </CListGroupItem>
-                  <CListGroupItem
-                      class="d-flex justify-content-between align-items-center"
-                  >
-                    <strong>pH Level:</strong>
-                    <CBadge class="large-badge" color="info" shape="pill">{{this.currentSelectSensorDataTimeValue['pH']}}</CBadge>
-                  </CListGroupItem>
-                  <CListGroupItem
-                      class="d-flex justify-content-between align-items-center"
-                  >
-                    <strong>TDS:</strong>
-                    <CBadge class="large-badge" color="info" shape="pill">{{this.currentSelectSensorDataTimeValue['tds']}}</CBadge>
-                  </CListGroupItem>
-                  <CListGroupItem
-                      class="d-flex justify-content-between align-items-center"
-                  >
-                    <strong>Temperature:</strong>
-                    <CBadge class="large-badge" color="info" shape="pill">{{this.currentSelectSensorDataTimeValue['temperature']}}</CBadge>
-                  </CListGroupItem>
-                  <CListGroupItem
-                      class="d-flex justify-content-between align-items-center"
-                  >
-                    <strong>Water Level:</strong>
-                    <CBadge class="large-badge" v-if="this.currentSelectSensorDataTimeValue['waterLevel'] === 'Normal'" color="success" shape="pill">
-                      {{this.currentSelectSensorDataTimeValue['waterLevel']}}</CBadge>
-                    <CBadge class="large-badge" v-else color="warning" shape="pill">
-                      {{this.currentSelectSensorDataTimeValue['waterLevel']}}</CBadge>
-                  </CListGroupItem>
-                </CListGroup>
-              </CCardBody>
+              <CButton class="text-left shadow-none card-header" @click="cardCollapse = !cardCollapse">
+                  <CIcon name="cil-justify-center"/>
+                  <strong> Data for {{selectedSensorName.replace(/([^A-Za-z0-9])/g, ' $1')}} on
+                    {{this.selectedSensorDate}} at {{this.selectedSensorTime}} </strong>
+              </CButton>
+              <CCollapse :show="cardCollapse">
+                <CCardBody>
+                  <CListGroup>
+                    <CListGroupItem
+                        class="d-flex justify-content-between align-items-center"
+                    >
+                      <strong>Pump 1 Status:</strong>
+                      <CBadge class="large-badge" v-if="this.currentSelectSensorDataTimeValue['pump1'] === 'Normal'" color="success" shape="pill">
+                        {{this.currentSelectSensorDataTimeValue['pump1']}}</CBadge>
+                      <CBadge class="large-badge" v-else color="warning" shape="pill">
+                        {{this.currentSelectSensorDataTimeValue['pump1']}}</CBadge>
+                    </CListGroupItem>
+                    <CListGroupItem
+                        class="d-flex justify-content-between align-items-center"
+                    >
+                      <strong>Pump 2 Status:</strong>
+                      <CBadge class="large-badge" v-if="this.currentSelectSensorDataTimeValue['pump2'] === 'Normal'" color="success" shape="pill">
+                        {{this.currentSelectSensorDataTimeValue['pump2']}}</CBadge>
+                      <CBadge class="large-badge" v-else color="warning" shape="pill">
+                        {{this.currentSelectSensorDataTimeValue['pump2']}}</CBadge>
+                    </CListGroupItem>
+                    <CListGroupItem
+                        class="d-flex justify-content-between align-items-center"
+                    >
+                      <strong>pH Level:</strong>
+                      <CBadge class="large-badge" color="info" shape="pill">{{this.currentSelectSensorDataTimeValue['pH']}}</CBadge>
+                    </CListGroupItem>
+                    <CListGroupItem
+                        class="d-flex justify-content-between align-items-center"
+                    >
+                      <strong>TDS:</strong>
+                      <CBadge class="large-badge" color="info" shape="pill">{{this.currentSelectSensorDataTimeValue['tds']}}</CBadge>
+                    </CListGroupItem>
+                    <CListGroupItem
+                        class="d-flex justify-content-between align-items-center"
+                    >
+                      <strong>Temperature:</strong>
+                      <CBadge class="large-badge" color="info" shape="pill">{{this.currentSelectSensorDataTimeValue['temperature']}}</CBadge>
+                    </CListGroupItem>
+                    <CListGroupItem
+                        class="d-flex justify-content-between align-items-center"
+                    >
+                      <strong>Water Level:</strong>
+                      <CBadge class="large-badge" v-if="this.currentSelectSensorDataTimeValue['waterLevel'] === 'Normal'" color="success" shape="pill">
+                        {{this.currentSelectSensorDataTimeValue['waterLevel']}}</CBadge>
+                      <CBadge class="large-badge" v-else color="warning" shape="pill">
+                        {{this.currentSelectSensorDataTimeValue['waterLevel']}}</CBadge>
+                    </CListGroupItem>
+                  </CListGroup>
+                </CCardBody>
+              </CCollapse>
             </CCard>
           </CCol>
         </CRow>
@@ -190,6 +192,7 @@ export default {
   },
   data () {
     return {
+      cardCollapse: true,
       currentSelectedSensorData: [],
       currentSelectedSensorDataTime: [],
       currentSelectSensorDataTimeValue: [],

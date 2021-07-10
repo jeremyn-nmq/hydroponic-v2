@@ -38,6 +38,8 @@ export default {
 
     this.transformedData = _.groupBy(_.groupBy(this.currentSensor.sensorData, 'day')[latestDay], 'hour')
     this.labels = Object.keys(this.transformedData);
+    // console.log('=============')
+    // console.log(this.transformedData)
   },
   computed: {
     pHDatasets () {
