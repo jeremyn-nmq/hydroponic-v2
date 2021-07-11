@@ -18,12 +18,14 @@ export default {
   },
   data () {
     return {
+      initData: {},
+      initDate: "",
       labels: [],
-      transformedData: []
+      allData: [],
     }
   },
   props: {
-    currentSensor: {
+    currentSensorData: {
       type: Object,
       default() {
         return {};
@@ -32,24 +34,35 @@ export default {
     currentParam: {
       type: String,
     },
+    currentDate: {
+      type: String,
+    },
   },
   mounted(){
-    let latestDay = this.currentSensor.sensorData[0].day;
 
-    this.transformedData = _.groupBy(_.groupBy(this.currentSensor.sensorData, 'day')[latestDay], 'hour')
-    this.labels = Object.keys(this.transformedData);
-    // console.log('=============')
-    // console.log(this.transformedData)
+    // let latestDay = this.currentSensor.sensorData[0].day;
+    // this.transformedData = _.groupBy(_.groupBy(this.currentSensor.sensorData, 'day')[latestDay], 'hour')
+    this.initData = this.calculateData(this.currentSensorData, this.currentDate);
+    this.labels = Object.keys(this.initData);
+    this.allData = Object.values(this.initData);
+  },
+  methods: {
+    calculateData (data, date){
+      return _.groupBy(data[date], 'hour');
+    },
   },
   computed: {
+    changeData(){
+      const {currentSensorData, currentDate} = this
+      return {currentSensorData, currentDate}
+    },
     pHDatasets () {
       const brandInfo = getStyle('info') || '#20a8d8'
 
       const pH = []
 
-      let allData = Object.values(this.transformedData);
-      for(let item in allData){
-        pH.push(allData[item][0].pH)
+      for(let item in this.allData){
+        pH.push(this.allData[item][0].pH)
       }
 
       return [
@@ -68,9 +81,8 @@ export default {
 
       const tds = []
 
-      let allData = Object.values(this.transformedData);
-      for(let item in allData){
-        tds.push(allData[item][0].tds)
+      for(let item in this.allData){
+        tds.push(this.allData[item][0].tds)
       }
 
       return [
@@ -89,9 +101,8 @@ export default {
 
       const temp = []
 
-      let allData = Object.values(this.transformedData);
-      for(let item in allData){
-        temp.push(allData[item][0].temperature)
+      for(let item in this.allData){
+        temp.push(this.allData[item][0].temperature)
       }
 
       return [
@@ -107,7 +118,6 @@ export default {
     },
     chartOptions () {
       return {
-
         maintainAspectRatio: false,
         legend: {
           display: false
@@ -130,13 +140,24 @@ export default {
         },
         elements: {
           point: {
-            radius: 5,
-            hitRadius: 15,
-            hoverRadius: 10,
-            hoverBorderWidth: 3
+            radius: 2,
+            hitRadius: 5,
+            hoverRadius: 5,
+            hoverBorderWidth: 2
           }
         }
       }
+    }
+  },
+  watch: {
+    changeData: {
+      handler: function(val) {
+        let newData = this.calculateData(val.currentSensorData, val.currentDate);
+        this.labels = Object.keys(newData);
+        this.allData = Object.values(newData);
+      },
+      deep: true,
+      immediate: true
     }
   }
 }

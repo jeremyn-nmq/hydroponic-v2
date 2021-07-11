@@ -14,6 +14,8 @@ const state = {
     sensor: JSON.parse(localStorage.getItem('sensor')) || [],
     fbInitData: {},
     currentUser: JSON.parse(localStorage.getItem('currentUser')) || [],
+    sensorChoice: {},
+    timeChoice: {}
 }
 
 export default new Vuex.Store({
@@ -55,6 +57,12 @@ export default new Vuex.Store({
         SET_CURRENT_USER(state, userAccount){
             // Vue.set(state, "currentUser", userAccount)
             state.currentUser = userAccount
+        },
+        SET_CURRENT_TIME_CHOICE(state, timeChoice){
+            state.choice = timeChoice
+        },
+        SET_CURRENT_SENSOR_CHOICE(state, sensorChoice){
+            state.choice = sensorChoice
         },
         set(state, [variable, value]) {
             state[variable] = value
