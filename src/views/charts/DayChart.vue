@@ -1,6 +1,6 @@
 <template>
   <CChartLine
-    :datasets="(currentParam === 'pH') ? pHDatasets : (currentParam === 'TDS') ? tdsDatasets : tempDatasets"
+    :datasets="processedDatasets"
     :options="chartOptions"
     :labels="this.labels"
   />
@@ -12,7 +12,7 @@ import { getStyle, hexToRgba } from '@coreui/utils/src'
 import _ from "lodash";
 
 export default {
-  name: 'MainChart',
+  name: 'DayChart',
   components: {
     CChartLine
   },
@@ -39,10 +39,8 @@ export default {
     },
   },
   mounted(){
-
-    // let latestDay = this.currentSensor.sensorData[0].day;
-    // this.transformedData = _.groupBy(_.groupBy(this.currentSensor.sensorData, 'day')[latestDay], 'hour')
     this.initData = this.calculateData(this.currentSensorData, this.currentDate);
+    console.log(this.initData)
     this.labels = Object.keys(this.initData);
     this.allData = Object.values(this.initData);
   },
@@ -56,65 +54,32 @@ export default {
       const {currentSensorData, currentDate} = this
       return {currentSensorData, currentDate}
     },
-    pHDatasets () {
-      const brandInfo = getStyle('info') || '#20a8d8'
+    processedDatasets() {
+      const infoStyle = getStyle('info') || '#20a8d8'
+      const successStyle = getStyle('success2') || '#4dbd74'
+      const dangerStyle = getStyle('danger') || '#f86c6b'
 
-      const pH = []
-
-      for(let item in this.allData){
-        pH.push(this.allData[item][0].pH)
-      }
-
-      return [
-        {
-          label: 'pH',
-          backgroundColor: hexToRgba(brandInfo, 10),
-          borderColor: brandInfo,
-          pointHoverBackgroundColor: brandInfo,
-          borderWidth: 2,
-          data: pH
-        }
-      ]
-    },
-    tdsDatasets () {
-      const brandSuccess = getStyle('success2') || '#4dbd74'
-
+      const temp = []
       const tds = []
+      const ph = []
 
       for(let item in this.allData){
+        ph.push(this.allData[item][0].pH)
+        temp.push(this.allData[item][0].temperature)
         tds.push(this.allData[item][0].tds)
       }
 
-      return [
-        {
-          label: 'TDS',
-          backgroundColor: hexToRgba(brandSuccess, 10),
-          borderColor: brandSuccess,
-          pointHoverBackgroundColor: brandSuccess,
-          borderWidth: 2,
-          data: tds
-        }
-      ]
-    },
-    tempDatasets () {
-      const brandDanger = getStyle('danger') || '#f86c6b'
+      let color = (this.currentParam === 'pH') ? infoStyle : (this.currentParam === 'TDS') ? successStyle : dangerStyle;
+      let returnedData = (this.currentParam === 'pH') ? ph : (this.currentParam === 'TDS') ? tds : temp;
 
-      const temp = []
-
-      for(let item in this.allData){
-        temp.push(this.allData[item][0].temperature)
-      }
-
-      return [
-        {
-          label: 'Temperature',
-          backgroundColor: hexToRgba(brandDanger, 10),
-          borderColor: brandDanger,
-          pointHoverBackgroundColor: brandDanger,
-          borderWidth: 2,
-          data: temp
-        }
-      ]
+      return [{
+        label: this.currentParam,
+        backgroundColor: hexToRgba(color, 10),
+        borderColor: color,
+        pointHoverBackgroundColor: color,
+        borderWidth: 2,
+        data: returnedData
+      }]
     },
     chartOptions () {
       return {

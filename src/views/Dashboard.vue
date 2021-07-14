@@ -125,8 +125,11 @@
             <CRow>
               <CCol sm="4">
                 <h4 class="card-title mb-0">{{this.selectedSensorName}}</h4>
-                <div class="text-muted mt-1">
+                <div v-show="selectedChart === 'Day'" class="text-muted mt-1">
                   Latest data on {{ this.selectedSensorDate}}
+                </div>
+                <div v-show="selectedChart === 'Week'" class="text-muted mt-1">
+                  Latest data of the previous 7 days, from {{this.weekDayFromDate[this.weekDayFromDate.length-1]}} to {{ this.weekDayFromDate[0]}}
                 </div>
               </CCol>
               <CCol sm="4" class="">
@@ -158,11 +161,15 @@
                 </CButtonGroup>
               </CCol>
             </CRow>
-            <MainChart style="height:300px;margin-top:40px;"
-                       v-if="selectedChart === 'Day'"
+            <DayChart style="height:300px;margin-top:40px;"
+                       v-show="selectedChart === 'Day'"
                        :current-sensor-data="this.currentSelectedSensorData"
                        :current-date="this.selectedSensorDate"
                        :current-param="selectedParam"/>
+            <WeekChart style="height:300px;margin-top:40px;"
+                      v-show="selectedChart === 'Week'"
+                      :current-sensor-data="this.filteredWeekData"
+                      :current-param="selectedParam"/>
           </CCardBody>
         </CCard>
       </div>
@@ -171,13 +178,15 @@
 </template>
 
 <script>
-import MainChart from './charts/MainChart'
+import DayChart from './charts/DayChart'
+import WeekChart from './charts/WeekChart'
 import _ from 'lodash';
 
 export default {
   name: 'Dashboard',
   components: {
-    MainChart
+    DayChart,
+    WeekChart
   },
   data () {
     return {
@@ -187,7 +196,9 @@ export default {
       currentSelectedSensorData: [],
       currentSelectedSensorDataTime: [],
       currentSelectSensorDataTimeValue: [],
+      filteredWeekData: [],
       userSensors: [],
+      weekDayFromDate: [],
       selectedSensorName: "",
       selectedSensorDate: "",
       selectedSensorTime: "",
@@ -203,11 +214,8 @@ export default {
     getCurrentDate(){
       return new Date().toLocaleDateString("en-GB");
     },
-    calculateDataForWeekView(){
-      //lay data cua
-    },
     onSelectedSensor: function(e){
-      this.selectedSensorName = this.userSensors.hasOwnProperty('name') ?this.userSensors.name : e.target.value;
+      this.selectedSensorName = this.userSensors.hasOwnProperty('name') ? this.userSensors.name : e.target.value;
       this.selectedSensorDate = "";
       this.selectedSensorTime = "";
       this.currentSelectedSensorData = [];
@@ -215,15 +223,15 @@ export default {
       this.currentSelectSensorDataTimeValue = [];
       if (this.userSensors.hasOwnProperty('name')){
         this.currentSelectedSensorData = _.groupBy(this.userSensors.sensorData, 'day')
-        // console.log("On selected sensor:");
-        // console.log(this.currentSelectedSensorData);
+        console.log("On selected sensor:");
+        console.log(this.currentSelectedSensorData);
         this.$store.commit("SET_CURRENT_SENSOR_CHOICE", this.currentSelectedSensorData)
       }
       else{
         this.currentSelectedSensorData = _.filter(this.userSensors, ['name', this.selectedSensorName]);
         this.currentSelectedSensorData = _.groupBy(this.currentSelectedSensorData[0].sensorData, 'day')
-        // console.log("On selected sensor:");
-        // console.log(this.currentSelectedSensorData)
+        console.log("On selected sensor:");
+        console.log(this.currentSelectedSensorData)
         this.$store.commit("SET_CURRENT_SENSOR_CHOICE", this.currentSelectedSensorData)
       }
     },
@@ -232,6 +240,21 @@ export default {
       this.selectedSensorTime = "";
       this.currentSelectedSensorDataTime = [];
       this.currentSelectSensorDataTimeValue = [];
+
+      //calculate data for week view
+      const convertSelectedDate = Date.parse(this.selectedSensorDate.split('/').reverse().join('-'))
+      this.weekDayFromDate = Array(7).fill(convertSelectedDate)
+          .map((date, i) => date - 86400000 * i).map(day => new Date(day).toLocaleDateString('en-GB'))
+      this.filteredWeekData = Object.keys(this.currentSelectedSensorData)
+          .filter(key => this.weekDayFromDate.includes(key))
+          .reduce((obj, key) => {
+            obj[key] = this.currentSelectedSensorData[key].filter((value, index) => index % 12 === 0);
+            return obj;
+          }, {});
+      this.$store.commit("SET_CURRENT_SENSOR_WEEK", this.filteredWeekData)
+
+
+      //calculate data for timeslot selected
       this.currentSelectedSensorDataTime = _.groupBy(this.currentSelectedSensorData[this.selectedSensorDate], 'hour')
       // console.log("On selected date:")
       // console.log(this.currentSelectedSensorDataTime);
