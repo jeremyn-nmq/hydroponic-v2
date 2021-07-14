@@ -15,6 +15,7 @@ const state = {
     fbInitData: {},
     currentUser: JSON.parse(localStorage.getItem('currentUser')) || [],
     sensorChoice: {},
+    weekData: {},
     timeChoice: {}
 }
 
@@ -63,6 +64,9 @@ export default new Vuex.Store({
         },
         SET_CURRENT_SENSOR_CHOICE(state, sensorChoice){
             state.choice = sensorChoice
+        },
+        SET_CURRENT_SENSOR_WEEK(state, weekData){
+            state.weekData = weekData
         },
         set(state, [variable, value]) {
             state[variable] = value
