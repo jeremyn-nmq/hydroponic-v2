@@ -221,6 +221,8 @@ export default {
       this.currentSelectedSensorData = [];
       this.currentSelectedSensorDataTime = [];
       this.currentSelectSensorDataTimeValue = [];
+      this.filteredWeekData = [];
+      this.weekDayFromDate = [];
       if (this.userSensors.hasOwnProperty('name')){
         this.currentSelectedSensorData = _.groupBy(this.userSensors.sensorData, 'day')
         console.log("On selected sensor:");
@@ -238,20 +240,22 @@ export default {
     onSelectedSensorDate: function(e){
       this.selectedSensorDate = e.target.value;
       this.selectedSensorTime = "";
+      this.weekDayFromDate = [];
       this.currentSelectedSensorDataTime = [];
       this.currentSelectSensorDataTimeValue = [];
 
       //calculate data for week view
-      const convertSelectedDate = Date.parse(this.selectedSensorDate.split('/').reverse().join('-'))
+      let convertSelectedDate = Date.parse(this.selectedSensorDate.split('/').reverse().join('-'))
       this.weekDayFromDate = Array(7).fill(convertSelectedDate)
           .map((date, i) => date - 86400000 * i).map(day => new Date(day).toLocaleDateString('en-GB'))
-      this.filteredWeekData = Object.keys(this.currentSelectedSensorData)
-          .filter(key => this.weekDayFromDate.includes(key))
-          .reduce((obj, key) => {
-            obj[key] = this.currentSelectedSensorData[key].filter((value, index) => index % 12 === 0);
-            return obj;
-          }, {});
-      this.$store.commit("SET_CURRENT_SENSOR_WEEK", this.filteredWeekData)
+      console.log(this.weekDayFromDate)
+      this.filteredWeekData = [];
+      this.filteredWeekData = Object.entries(this.currentSelectedSensorData).filter(d => this.weekDayFromDate.includes(d[0]))
+      let divider = this.filteredWeekData.length
+      console.log(divider)
+      this.filteredWeekData.forEach(data => {
+        data[1] = data[1].filter((value, index) => index % (divider === 1 ? 1 : divider < 3 ? 12 : divider === 7 ? 36 : 24) === 0)
+      })
 
 
       //calculate data for timeslot selected

@@ -40,7 +40,6 @@ export default {
   },
   mounted(){
     this.initData = this.calculateData(this.currentSensorData, this.currentDate);
-    console.log(this.initData)
     this.labels = Object.keys(this.initData);
     this.allData = Object.values(this.initData);
   },

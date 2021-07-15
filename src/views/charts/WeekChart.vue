@@ -2,7 +2,7 @@
   <CChartLine
     :datasets="processedDatasets"
     :options="chartOptions"
-    :labels="this.labels"
+    :labels="computedLabels"
   />
 </template>
 
@@ -26,9 +26,9 @@ export default {
   },
   props: {
     currentSensorData: {
-      type: Object,
+      type: Array,
       default() {
-        return {};
+        return [];
       },
     },
     currentParam: {
@@ -36,18 +36,17 @@ export default {
     }
   },
   mounted(){
-    this.initData = {}
-    this.allData = []
-    this.initData = this.currentSensorData;
-    let dates = Object.keys(this.initData)
-    for (let date in dates){
-      this.initData[dates[date]][0].hour = this.initData[dates[date]][0].day + ' ' + this.initData[dates[date]][0].hour
-    }
-    this.allData = _.flatten(Object.values(this.initData))
-    this.labels = [];
-    for(let item in this.allData){
-      this.labels.push(this.allData[item].hour)
-    }
+    // this.initData = this.currentSensorData;
+    // let dates = Object.keys(this.initData)
+    // for (let date in dates){
+    //   this.initData[dates[date]][0].hour = this.initData[dates[date]][0].day + ' ' + this.initData[dates[date]][0].hour
+    // }
+    this.allData = _.flatten(_.flatten(this.currentSensorData).filter((_,i) => i%2 === 1))
+    console.log(this.allData)
+    // for(let item in this.allData){
+    //   this.labels.push(this.allData[item].hour)
+    // }
+    // console.log(this.labels)
 
   },
   methods: {
@@ -66,6 +65,20 @@ export default {
     // }
   },
   computed: {
+    computedLabels(){
+      let labels = [];
+      let watcher = this.allData[0].day
+      for(let item in this.allData){
+        if (watcher !== this.allData[item].day){
+          watcher = this.allData[item].day
+          labels.push(this.allData[item].day + ' ' + this.allData[item].hour)
+        }
+        else labels.push(this.allData[item].hour)
+      }
+      labels[0] = this.allData[0].day + ' ' + this.allData[0].hour
+      console.log(labels)
+      return labels
+    },
     processedDatasets() {
       const infoStyle = getStyle('info') || '#20a8d8'
       const successStyle = getStyle('success2') || '#4dbd74'
@@ -108,7 +121,6 @@ export default {
           yAxes: [{
             ticks: {
               beginAtZero: true,
-              maxTicksLimit: 5
             },
             gridLines: {
               display: true
@@ -126,14 +138,15 @@ export default {
       }
     }
   },
-  // watch: {
-  //   myProp: {
-  //     immediate: true,
-  //     handler (val, oldVal) {
-  //       console.log("Props changed")
-  //       console.log(val)
-  //     }
-  //   }
-  // }
+  watch: {
+    currentSensorData: {
+      immediate: true,
+      deep: true,
+      handler (val, oldVal) {
+        console.log("Props changed")
+        this.allData = _.flatten(_.flatten(val).filter((_,i) => i%2 === 1))
+      }
+    }
+  }
 }
 </script>
