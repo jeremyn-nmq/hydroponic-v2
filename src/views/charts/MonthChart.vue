@@ -9,10 +9,9 @@
 <script>
 import { CChartLine } from '@coreui/vue-chartjs'
 import { getStyle, hexToRgba } from '@coreui/utils/src'
-import _ from "lodash";
 
 export default {
-  name: 'WeekChart',
+  name: 'MonthChart',
   components: {
     CChartLine
   },
@@ -36,21 +35,14 @@ export default {
     }
   },
   mounted(){
-    this.allData = _.flatten(_.flatten(this.currentSensorData).filter((_,i) => i%2 === 1))
+    this.allData = this.currentSensorData;
   },
   computed: {
     computedLabels(){
       let labels = [];
-      let watcher = this.allData[0].day
-      for(let item in this.allData){
-        if (watcher !== this.allData[item].day){
-          watcher = this.allData[item].day
-          labels.push(this.allData[item].day + ' ' + this.allData[item].hour)
-        }
-        else labels.push(this.allData[item].hour)
+      for (let item in this.allData){
+        labels.push(this.allData[item].date)
       }
-      labels[0] = this.allData[0].day + ' ' + this.allData[0].hour
-      console.log(labels)
       return labels
     },
     processedDatasets() {
@@ -64,7 +56,7 @@ export default {
 
       for(let item in this.allData){
         ph.push(this.allData[item].pH)
-        temp.push(this.allData[item].temperature)
+        temp.push(this.allData[item].temp)
         tds.push(this.allData[item].tds)
       }
 
@@ -118,7 +110,7 @@ export default {
       deep: true,
       handler (val, oldVal) {
         console.log("Props changed")
-        this.allData = _.flatten(_.flatten(val).filter((_,i) => i%2 === 1))
+        this.allData = val
       }
     }
   }

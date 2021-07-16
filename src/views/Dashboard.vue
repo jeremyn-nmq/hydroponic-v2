@@ -170,6 +170,10 @@
                       v-show="selectedChart === 'Week'"
                       :current-sensor-data="this.filteredWeekData"
                       :current-param="selectedParam"/>
+            <MonthChart style="height:300px;margin-top:40px;"
+                       v-show="selectedChart === 'Month'"
+                       :current-sensor-data="this.filteredMonthData"
+                       :current-param="selectedParam"/>
           </CCardBody>
         </CCard>
       </div>
@@ -180,13 +184,16 @@
 <script>
 import DayChart from './charts/DayChart'
 import WeekChart from './charts/WeekChart'
+import MonthChart from './charts/MonthChart'
+
 import _ from 'lodash';
 
 export default {
   name: 'Dashboard',
   components: {
     DayChart,
-    WeekChart
+    WeekChart,
+    MonthChart
   },
   data () {
     return {
@@ -197,8 +204,10 @@ export default {
       currentSelectedSensorDataTime: [],
       currentSelectSensorDataTimeValue: [],
       filteredWeekData: [],
+      filteredMonthData: [],
       userSensors: [],
       weekDayFromDate: [],
+      monthDayFromDate: [],
       selectedSensorName: "",
       selectedSensorDate: "",
       selectedSensorTime: "",
@@ -215,6 +224,7 @@ export default {
       return new Date().toLocaleDateString("en-GB");
     },
     onSelectedSensor: function(e){
+      //resets all values
       this.selectedSensorName = this.userSensors.hasOwnProperty('name') ? this.userSensors.name : e.target.value;
       this.selectedSensorDate = "";
       this.selectedSensorTime = "";
@@ -222,7 +232,11 @@ export default {
       this.currentSelectedSensorDataTime = [];
       this.currentSelectSensorDataTimeValue = [];
       this.filteredWeekData = [];
+      this.filteredMonthData = [];
       this.weekDayFromDate = [];
+      this.monthDayFromDate = [];
+
+      //calculate user sensor
       if (this.userSensors.hasOwnProperty('name')){
         this.currentSelectedSensorData = _.groupBy(this.userSensors.sensorData, 'day')
         console.log("On selected sensor:");
@@ -241,22 +255,42 @@ export default {
       this.selectedSensorDate = e.target.value;
       this.selectedSensorTime = "";
       this.weekDayFromDate = [];
+      this.monthDayFromDate = [];
       this.currentSelectedSensorDataTime = [];
       this.currentSelectSensorDataTimeValue = [];
 
-      //calculate data for week view
+      //prepare data for week and month view
       let convertSelectedDate = Date.parse(this.selectedSensorDate.split('/').reverse().join('-'))
+      let daysInMonth = new Date(new Date(convertSelectedDate).getFullYear(),
+          new Date(convertSelectedDate).getMonth() + 1, 0). getDate();
+
+      //calculate data for week view
       this.weekDayFromDate = Array(7).fill(convertSelectedDate)
           .map((date, i) => date - 86400000 * i).map(day => new Date(day).toLocaleDateString('en-GB'))
-      console.log(this.weekDayFromDate)
       this.filteredWeekData = [];
       this.filteredWeekData = Object.entries(this.currentSelectedSensorData).filter(d => this.weekDayFromDate.includes(d[0]))
       let divider = this.filteredWeekData.length
-      console.log(divider)
       this.filteredWeekData.forEach(data => {
         data[1] = data[1].filter((value, index) => index % (divider === 1 ? 1 : divider < 3 ? 12 : divider === 7 ? 36 : 24) === 0)
       })
 
+      //calculate data for month view
+      let startDay = new Date(new Date(convertSelectedDate).getFullYear(), new Date(convertSelectedDate).getMonth(), 1)
+      this.monthDayFromDate = Array(daysInMonth).fill(Date.parse(startDay))
+          .map((date, i) => date + 86400000 * i).map(day => new Date(day).toLocaleDateString('en-GB'))
+      this.filteredMonthData = [];
+      this.filteredMonthData = Object.entries(this.currentSelectedSensorData).filter(d => this.monthDayFromDate.includes(d[0]))
+      let tempArr = []
+      this.filteredMonthData.forEach(data => {
+        let newObj = {
+          date: data[0],
+          pH: data[1].reduce((total, current) => total + parseFloat(current.pH), 0) / data[1].length,
+          tds: data[1].reduce((total, current) => total + parseFloat(current.tds), 0) / data[1].length,
+          temp: data[1].reduce((total, current) => total + parseFloat(current.temperature), 0) / data[1].length
+        }
+        tempArr.push(newObj)
+      })
+      this.filteredMonthData = tempArr;
 
       //calculate data for timeslot selected
       this.currentSelectedSensorDataTime = _.groupBy(this.currentSelectedSensorData[this.selectedSensorDate], 'hour')
